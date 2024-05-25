@@ -11,7 +11,6 @@ from django.contrib import messages
 from django.db.models import Sum
 from project.models import User, Reservation,Menu,Commande,Cart_List
 
-
 class Profile(LoginRequiredMixin, UpdateView):
     """admin user view and update profile"""
     form_class = UpdateUser
@@ -230,3 +229,12 @@ def removeCommande_view(request,commande_id):
 	item_toremove.delete()
 	messages.info(request,"Cette commande a été supprimé .")
 	return HttpResponseRedirect(reverse("view_commandes"))
+
+@login_required(login_url="/login/")
+def completCommande_view(request,commande_id):  
+    commande = Commande.objects.get(pk=commande_id)
+    commande.complete = True
+    commande.save()
+    messages.info(request,"Cette commande a été mise à jour .")
+    return HttpResponseRedirect(reverse("view_commandes"))
+

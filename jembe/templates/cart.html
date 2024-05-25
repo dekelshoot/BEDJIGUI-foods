@@ -243,6 +243,7 @@
 	  <th scope="col">Total</th>
 	  <th scope="col">Date</th>
       <th scope="col">Statut</th>
+      <th scope="col">Facture</th>
 
     </tr>
   </thead>
@@ -260,7 +261,16 @@
       <td>{{commande.commande}}
 	  {% if not commande.commande.complete %}
     	<a class="btn btn-danger" href="{% url 'removecommande' commande.id %}"> Annuler </a>
-    	{% endif %}
+    	
+        {% endif %}
+	  </td>
+
+      <td>
+	  {% if  commande.commande.complete %}
+    	<a class="btn btn-primary" href="{% url 'download_facture' commande.id %}"> <i class="bi bi-download"></i>Télécharger </a>
+    	{% else %}
+        <p>non disponible</p>
+        {% endif %}
 	  </td>
     </tr>
 {% endfor %}

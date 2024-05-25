@@ -199,7 +199,7 @@
                                                     <td>{{ commande.date }}</td>
                                                     <td>{{ commande.commande }}
                                                     {% if not commande.commande.complete %}
-                                                    <button class="btn btn-success" >Completer</button>
+                                                    <a class="btn btn-success" href="{% url 'complet_commande' commande.id %}"> Completer </a>
                                                     {% endif %}
                                                     {% if not commande.commande.complete %}
                                                     <a class="btn btn-danger" href="{% url 'remove_commande' commande.id %}"> Annuler </a>

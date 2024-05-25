@@ -4,13 +4,13 @@ from jembe.models import Contact
 from project.models import User, Reservation
 
 
+
 class ReservationForm(forms.ModelForm):
     
     date_reserved = forms.DateField(widget=forms.TextInput(
         attrs={}), required=True,)
     email = forms.EmailField(widget=forms.TextInput
-                             (attrs={'id': 'reservation_email',
-                                     'disabled': "disabled"}))
+                             (attrs={'id': 'reservation_email'}))
     time = forms.TimeField(
         widget=forms.TextInput(attrs={'id': 'reservation_time',
                                       'placeholder': "Heure prévue"}))
@@ -22,8 +22,7 @@ class ReservationForm(forms.ModelForm):
                'id': 'reservation_phone',
                }), required=True,)
     first_name = forms.CharField(widget=forms.TextInput(
-        attrs={'disabled':'disabled',
-               'id': 'reservation_phone',
+        attrs={'id': 'reservation_phone',
                }), required=True,)
     
     class Meta:

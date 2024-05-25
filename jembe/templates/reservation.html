@@ -179,6 +179,7 @@
                     <div class="area-title text-center">
                         <h2>réservation</h2>
                         <h3>Formulaire de réservation</h3>
+
                     </div>
                 </div>
             </div>
@@ -189,7 +190,7 @@
                         <div class="row">
                             <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
                                 <label for="reservation_name"><i class="fa fa-user-o"></i></label>
-                                        {{ form.first_name|attr:"placeholder:Full Name" }}                            </div>
+                                        {{ form.first_name }}                            </div>
                             <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
                                 <label for="reservation_email"><i class="fa fa-envelope-o"></i></label>
                                {{ form.email }}
@@ -226,8 +227,51 @@
                             </div>
                         </div>
                     </form>
+
+
                 </div>
             </div>
+            <hr>
+
+<br><br><br>
+<h1>Toutes les réservations</h1>
+ <div class="panel-body">
+<div class="row">
+<div class="col-md-12 col-sm-12 col-xs-12">
+<table  id="datatable" class="table table-striped table-bordered table-responsive">
+  <thead>
+    <tr>
+      <th scope="col">Nom</th>
+      <th scope="col">email</th>
+	  <th scope="col">date rervée</th>
+	  <th scope="col">heure</th>
+      <th scope="col">Nombre de personne</th>
+      <th scope="col">Téléphone</th>
+      <th scope="col">Statut</th>
+
+    </tr>
+  </thead>
+  <tbody>
+  {% for res in reservation %}
+    <tr>
+	  <td>{{res.first_name}}</td>
+	  <td>{{res.email}}</td>
+      <td>{{res.date_reserved}}</td>
+      <td>{{res.time}}</td>
+      <td>{{res.people}}</td>
+      <td>{{res.phone}}</td>
+
+      <td> {{res.status}}
+    	<a class="btn btn-danger" href="{% url 'removereservation' res.id %}"> Annuler </a>
+	  </td>
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
+</div>
+</div>
+</div>
+
             <div class="row">
                 <div class="col-md-6 col-lg-6 col-sm-12 col-xs-12">
                     <div class="reservation-call-to-action">

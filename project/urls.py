@@ -20,4 +20,6 @@ urlpatterns = [
     url(r'^update-menu/(?P<pk>\d+)/$',
         views.UpdateMenu.as_view(), name="update_menu"),
     url(r'^remove-commande/(?P<commande_id>\d+)/$', views.removeCommande_view, name="remove_commande"),
+    url(r'^complet-commande/(?P<commande_id>\d+)/$', views.completCommande_view, name="complet_commande"),
+    
 ]
