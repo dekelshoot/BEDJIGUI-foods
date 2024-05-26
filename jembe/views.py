@@ -27,87 +27,80 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 @login_required(login_url="/login/")
 def home(request):
+    # Définition du contexte pour passer des données à votre modèle
     context = {
-		"menu" : Menu.objects.all(),
+		"menu" : Menu.objects.all(), # Récupère tous les objets Menu depuis la base de données
 	}
+    # Rend la page d'accueil (index.html) en utilisant le contexte défini
     return render(request, "index.html",context)
 
 @login_required(login_url="/login/")
 def about(request):
+    # Rend la page about.html
     return render(request, "about.html")
-
-# class Profile(LoginRequiredMixin, UpdateView):
-#     """admin user view and update profile"""
-#     form_class = UpdateUser
-#     model = User
-#     template_name = "super/profile.html"
-#     login_url = "/login/"
-
-#     def get_object(self, queryset=None):
-#         return self.request.user
-
-#     def form_valid(self, form):
-#         form.save()
-#         messages.success(
-#             self.request, ("your profile has been updated successfully"))
-#         return redirect('/profile')
-
-
-
 
 
 class NewReservation(CreateView):
+    # Spécifie le template utilisé pour rendre la page de réservation
     template_name = "reservation.html"
+    # Spécifie le formulaire utilisé pour saisir les informations de réservation
     form_class = ReservationForm
+    # Spécifie le modèle sur lequel cette vue est basée
     model = Reservation
     
     def get_form_kwargs(self):
+        # Récupère les arguments du formulaire et les met à jour avec les valeurs initiales
         kwargs = super().get_form_kwargs()
-        user =  self.request.user
         kwargs.update({'initial': {
              'email': self.request.user.email,
              'first_name': self.request.user.username,
              }})
         return kwargs
+    
     def get_context_data(self, **kwargs):
+        # Ajoute les réservations existantes de l'utilisateur connecté au contexte
         context = super().get_context_data(**kwargs)
         context['reservation'] = Reservation.objects.filter(first_name=self.request.user.username)
         return context
  
     def form_valid(self, form):
+        # Enregistre la nouvelle réservation dans la base de données
         new = form.save(commit=False)
         new.save()
-        # sends a flash message to the user
+        # Envoie un message de succès à l'utilisateur
         messages.success(
             self.request,
-            "vous avez réservé avec succès une nouvelle" +
-            " table confirmez votre en payant la table ")
-        # redirect the user back to his/her dashboard
+            "Vous avez réservé avec succès une nouvelle table. Confirmez en payant la table."
+        )
+        # Redirige l'utilisateur vers la page de paiement
         return redirect("/payments")
-
-
 class Contact(CreateView):
+    # Spécifie le template utilisé pour rendre la page de contact
     template_name = "contact.html"
+    # Spécifie le formulaire utilisé pour saisir les informations de contact
     form_class = ContactForm
 
     def form_valid(self, form):
+        # Enregistre le nouveau message dans la base de données
         new = form.save(commit=False)
         new.save()
-        # send a flash message to the user
+        # Envoie un message de succès à l'utilisateur
         messages.success(
             self.request,
-            "your message was sent successfully")
-        # redirect the user back to contact page
+            "Votre message a été envoyé avec succès."
+        )
+        # Redirige l'utilisateur vers la page de contact
         return redirect("/contact")
-
 
 @login_required(login_url="/login/")
 def payment(request):
+    # Rend la page de paiement
     return render(request, "payment.html")
 
 @login_required(login_url="/login/")
 def cart_view(request):
     if request.method == "POST":
+        # Gère l'ajout d'un menu au panier
         item_id = request.POST.get("item_id")
         user = request.user
         p = Menu.objects.get(pk=item_id)
@@ -123,7 +116,7 @@ def cart_view(request):
         return HttpResponseRedirect(reverse("home"))
         # return render(request, "orders/index.html", {"message": "Meal added to cart!"})
     else:
-
+        # Affiche le contenu actuel du panier
         commandes = {}
         i=1
         for commande in Commande.objects.filter(user_id=request.user.id):
@@ -159,8 +152,7 @@ def cart_view(request):
     
 @login_required(login_url="/login/")
 def removefromcart_view(request, cart_id):
-	# view topping from cart
-
+	# Supprime un élément du panier
 	item_toremove = Cart_List.objects.get(pk=cart_id)
 	item_toremove.delete()
 	messages.info(request,"Ce Menu a été supprimé de votre Commande.")
@@ -168,8 +160,7 @@ def removefromcart_view(request, cart_id):
 
 @login_required(login_url="/login/")
 def order_view(request):
-	# place an order
-
+	# passer une commande
 	if request.method == "POST":
 		user = request.user
 		items = request.POST.getlist("cart_id")
@@ -192,6 +183,7 @@ def order_view(request):
 
 @login_required(login_url="/login/")
 def removeCommande_view(request,commande_id):
+     # Supprime une commande
 	item_toremove = Commande.objects.get(pk=commande_id)
 	item_toremove.delete()
 	messages.info(request,"Cette commande a été supprimé .")
@@ -199,12 +191,15 @@ def removeCommande_view(request,commande_id):
 
 @login_required(login_url="/login/")
 def removeReservation_view(request,reservation_id):
+     # Supprime une réservation
 	item_toremove = Reservation.objects.get(pk=reservation_id)
 	item_toremove.delete()
 	messages.info(request,"Cette réservation a été supprimé .")
 	return HttpResponseRedirect(reverse("reservation"))
+
 @login_required(login_url="/login/")
-def downloadFacture_view(request,commande_id):  
+def downloadFacture_view(request,commande_id): 
+    # Télécharge une facture 
     commande = Commande.objects.get(pk=commande_id)
 
     commandes={}
@@ -216,15 +211,11 @@ def downloadFacture_view(request,commande_id):
     commandes["items"] = [] 
     carts= Cart_List.objects.filter(commande=commande)
     for cart in carts:
-         c= cart
-        #  for obj in commandes["items"]:
-        #       if 
-         commandes["items"].append({"description": str(cart).split(', - prix: € ')[0], "quantity": 1, "unit_price": int(str(cart).split(', - prix: € ')[-1].split(".")[0])})
+        c= cart
+        commandes["items"].append({"description": str(cart).split(', - prix: € ')[0], "quantity": 1, "unit_price": int(str(cart).split(', - prix: € ')[-1].split(".")[0])})
+    #Générer une facture
     generate_invoice("media/facture.pdf", commandes)
     print(commandes.items())
-    # Données de la facture
- 
-    
     messages.info(request,"Cette commande a été téléchargé .")
 
     
@@ -238,6 +229,7 @@ def downloadFacture_view(request,commande_id):
 
 
 def generate_invoice(filename, invoice_data):
+        #Génère une facture
         # Création du document PDF
         document = SimpleDocTemplate(filename, pagesize=A4)
         content = []
@@ -259,7 +251,7 @@ def generate_invoice(filename, invoice_data):
                 content.append(Paragraph(info, style_normal))
         content.append(Spacer(1, 12))
 
-        # Tableau des articles
+        # Tableau des Menus
         items = invoice_data.get("items", [])
         table_data = [["designation", "Quantité", "Prix unitaire", "Total"]]
         for item in items:
