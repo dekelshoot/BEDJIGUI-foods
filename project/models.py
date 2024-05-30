@@ -69,19 +69,9 @@ class Menu(models.Model):
         return self.name
 
 
-class Cart_List(models.Model):
-	user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-	menu_id = models.ForeignKey(Menu, on_delete=models.CASCADE)
-	calculated_price = models.FloatField()
-	is_current = models.BooleanField(default=True)
-	created_at = models.DateTimeField(auto_now_add=True)
-	def __str__(self):
-			return f"{self.menu_id.name}, - prix: € {self.calculated_price}"
-	
-
-class Commande(models.Model):
+class Table_List(models.Model):
 	"""
-    Cart_List: Ce modèle représente une liste de menus dans un panier d'achat pour un utilisateur spécifique.
+    Table_List: Ce modèle représente une liste de menus dans un panier d'achat pour un utilisateur spécifique.
 
     Champs :
     - `user_id` (ForeignKey) : Référence à l'utilisateur associé à ce panier. Clé étrangère pointant vers le modèle User. 
@@ -96,14 +86,38 @@ class Commande(models.Model):
     - `__str__()` : Retourne une représentation en chaîne de caractères du panier sous la forme "nom du menu - prix: € prix calculé".
     """
 	user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-	cart_id = models.ManyToManyField(Cart_List)
-	complete = models.BooleanField(default=False)
+	menu_id = models.ForeignKey(Menu, on_delete=models.CASCADE)
+	calculated_price = models.FloatField()
+	is_current = models.BooleanField(default=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	def __str__(self):
-		if self.complete == False:
-			return "Statut: en cours"
-		else:
-			return "Statut: Complete"
+			return f"{self.menu_id.name}, - prix: € {self.calculated_price}"
+	
+
+
+class Commande(models.Model):
+    """
+    Commande représentant une commande passée par un utilisateur.
+
+    Attributs :
+    - user_id : référence à l'utilisateur ayant passé la commande.
+    - table_id : référence à une  tables associées à la commande.
+    - complete : booléen indiquant si la commande est complétée ou non.
+    - created_at : date et heure de création de la commande.
+    """
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)  # Utilisateur ayant passé la commande
+    table_id = models.ManyToManyField(Table_List)  # Tables associées à la commande
+    complete = models.BooleanField(default=False)  # Statut de la commande (complétée ou en cours)
+    created_at = models.DateTimeField(auto_now_add=True)  # Date et heure de création de la commande
+
+    def __str__(self):
+        """
+        Retourne une chaîne représentant le statut de la commande.
+        """
+        if self.complete == False:
+            return "Statut: en cours"
+        else:
+            return "Statut: Complete"
 
 
 class Reservation(models.Model):

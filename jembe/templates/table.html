@@ -149,7 +149,7 @@
                             <ul class="page-location">
                                 <li><a href="{% url 'home' %}">Home</a></li>
                                 <li><i class="fa fa-angle-right"></i></li>
-                                <li class="active"><a href="{% url 'cart' %}">Commande</a></li>
+                                <li class="active"><a href="{% url 'table' %}">Commande</a></li>
                             </ul>
                         </div>
                     </div>
@@ -179,7 +179,7 @@
 
             <h1>Commande</h1>
 
-{% if cart_items %}
+{% if table_items %}
 
 		<form action="{% url 'order' %}" method="post">
 {% csrf_token %}
@@ -196,11 +196,11 @@
 	
   </thead>
   <tbody>
-  {% for item in cart_items %}
+  {% for item in table_items %}
     <tr>
-      <td><input type="hidden" value="{{item.id}}" name="cart_id"> {{ item }}
+      <td><input type="hidden" value="{{item.id}}" name="table_id"> {{ item }}
 	 </td>
-      <td><a href="{% url 'removefromcart' item.id %}"> Retirer </a></td>
+      <td><a href="{% url 'removefromtable' item.id %}"> Retirer </a></td>
     </tr>
 	{% endfor %}
   </tbody>
@@ -252,8 +252,8 @@
     <tr>
       <th scope="row">{{key}}</th>
       <td>
-	  {% for cart in commande.carts %}
-	  <button class="btn btn-primary" >{{cart}}</button>
+	  {% for table in commande.tables %}
+	  <button class="btn btn-primary" >{{table}}</button>
 	  {% endfor %}
 	  </td>
 	  <td>{{commande.total}} € </td>

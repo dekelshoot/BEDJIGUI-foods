@@ -76,7 +76,7 @@
                                 <a href="{% url 'reservation' %}">Réserver une table</a>
                             </div>
                             <div class="book-table-popup">
-                                <a href="{% url 'cart' %}">Commande</a>
+                                <a href="{% url 'table' %}">Commande</a>
                             </div>
                             <div class="top-social-bookmark">
                                 <ul>
@@ -175,7 +175,7 @@
             </div>
             <div class="row">
             {% for item in menu %}
-            <form action="{% url 'cart' %}" method="post">
+            <form action="{% url 'table' %}" method="post">
                 <div class="col-md-4 col-lg-4 col-sm-12 col-xs-12">
                     <div class="single-promotions text-center">
                         <div class="promotions-img">
@@ -193,7 +193,7 @@
                             </div>
                         <div class="promotions-details">
                             <h4>{{item.name}}</h4>
-                            <button class="btn read-more" type="submit">Add to cart</button>
+                            <button class="btn read-more" type="submit">Add to table</button>
                         </div>
                     </div>     
                 </div>
@@ -224,7 +224,7 @@
             
             <div class="row food-menu-list">
                  {% for item in menu %}
-            <form action="{% url 'cart' %}" method="post">
+            <form action="{% url 'table' %}" method="post">
                 <div class="mix col-md-3 col-lg-3 col-sm-6 col-xs-12 single-menu breakfast  snacks">
                     <div class="food-menu-img">
                         <a href="{{item.picture.url}}" class="menu-popup" data-effect="mfp-zoom-out"><img src="{{item.picture.url}}" alt=""></a>
@@ -234,7 +234,7 @@
                         <p class="menu-price">{{item.prix}} €</p>
                         {% csrf_token %}
                         <div class="promotions-details">
-                            <button class="btn read-more" type="submit">Add to cart</button>
+                            <button class="btn read-more" type="submit">Add to table</button>
                         </div>
                             <div class="form-group" style="display:none">
                                 <label for="exampleFormControlSelect1">

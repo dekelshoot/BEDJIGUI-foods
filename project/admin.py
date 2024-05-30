@@ -1,5 +1,5 @@
 from django.contrib import admin
-from project.models import Reservation, User, Menu,Cart_List,Commande
+from project.models import Reservation, User, Menu,Table_List,Commande
 from django.contrib.auth.admin import UserAdmin
 # Register your models here.
 
@@ -21,8 +21,8 @@ class MyUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         (None, {'fields': ('picture','telephone','adresse')}),
     )
-class CardAdmin(admin.ModelAdmin):
-	model = Cart_List
+class TableAdmin(admin.ModelAdmin):
+	model = Table_List
 
 class CommandeAdmin(admin.ModelAdmin):
 	model = Commande
@@ -30,5 +30,5 @@ class CommandeAdmin(admin.ModelAdmin):
 admin.site.register(User, MyUserAdmin)
 admin.site.register(Reservation, ReservationAdmin)
 admin.site.register(Menu, MenuAdmin)
-admin.site.register(Cart_List, CardAdmin)
+admin.site.register(Table_List, TableAdmin)
 admin.site.register(Commande, CommandeAdmin)

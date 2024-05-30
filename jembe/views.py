@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-from project.models import User, Reservation,Menu,Cart_List,Commande
+from project.models import User, Reservation,Menu,Table_List,Commande
 from jembe.forms import ReservationForm, LoginForm, RegisterForm
 from jembe.forms import ReservationForm, ContactForm
 from django.db.models import Sum
@@ -98,7 +98,7 @@ def payment(request):
     return render(request, "payment.html")
 
 @login_required(login_url="/login/")
-def cart_view(request):
+def table_view(request):
     if request.method == "POST":
         # Gère l'ajout d'un menu au panier
         item_id = request.POST.get("item_id")
@@ -106,15 +106,15 @@ def cart_view(request):
         p = Menu.objects.get(pk=item_id)
         print(item_id)
         total_price = p.prix 
-        new_cart = Cart_List(user_id=user, menu_id=Menu.objects.get(pk = item_id),  calculated_price=total_price)
+        new_table = Table_List(user_id=user, menu_id=Menu.objects.get(pk = item_id),  calculated_price=total_price)
 
-		# add item to cart
-        new_cart.save()
+		# add item to table
+        new_table.save()
 
-		# return HttpResponseRedirect(reverse("cart"))
+		# return HttpResponseRedirect(reverse("table"))
         messages.success(request, "Menu ajouté dans à la commande !")
         return HttpResponseRedirect(reverse("home"))
-        # return render(request, "orders/index.html", {"message": "Meal added to cart!"})
+        # return render(request, "orders/index.html", {"message": "Meal added to table!"})
     else:
         # Affiche le contenu actuel du panier
         commandes = {}
@@ -122,48 +122,48 @@ def cart_view(request):
         for commande in Commande.objects.filter(user_id=request.user.id):
             commandes[i] ={}
             commandes[i]["commande"] =commande
-            commandes[i]["carts"] =[]
+            commandes[i]["tables"] =[]
             commandes[i]["date"] =commande.created_at
             commandes[i]["id"] =commande.id
-            carts= Cart_List.objects.filter(commande=commande)
-            commandes[i]["total"] =carts.aggregate(Sum('calculated_price'))['calculated_price__sum']
-            for cart in carts:
-                 commandes[i]["carts"].append(cart)
+            tables= Table_List.objects.filter(commande=commande)
+            commandes[i]["total"] =tables.aggregate(Sum('calculated_price'))['calculated_price__sum']
+            for table in tables:
+                 commandes[i]["tables"].append(table)
             i=i+1
         print(commandes.items())
         try:
-            cart = Cart_List.objects.filter(user_id=request.user, is_current=True)
-        except Cart_List.DoesNotExist:
-            raise Http404("Cart does not exist")
+            table = Table_List.objects.filter(user_id=request.user, is_current=True)
+        except Table_List.DoesNotExist:
+            raise Http404("table does not exist")
 		
-        total_price = cart.aggregate(Sum('calculated_price'))['calculated_price__sum']
+        total_price = table.aggregate(Sum('calculated_price'))['calculated_price__sum']
 
-        cart_ordered = Cart_List.objects.filter(user_id=request.user, is_current=False)
+        table_ordered = Table_List.objects.filter(user_id=request.user, is_current=False)
 
         context = {
-        "carts":carts,
+
         "commandes":commandes,
-        "cart_items" : cart,
+        "table_items" : table,
         "total_price": total_price,
-        "cart_items_ordered" : cart_ordered,
+        "table_items_ordered" : table_ordered,
         }
 
-        return render(request, "cart.html", context)
+        return render(request, "table.html", context)
     
 @login_required(login_url="/login/")
-def removefromcart_view(request, cart_id):
+def removefromtable_view(request, table_id):
 	# Supprime un élément du panier
-	item_toremove = Cart_List.objects.get(pk=cart_id)
+	item_toremove = Table_List.objects.get(pk=table_id)
 	item_toremove.delete()
 	messages.info(request,"Ce Menu a été supprimé de votre Commande.")
-	return HttpResponseRedirect(reverse("cart"))
+	return HttpResponseRedirect(reverse("table"))
 
 @login_required(login_url="/login/")
 def order_view(request):
 	# passer une commande
 	if request.method == "POST":
 		user = request.user
-		items = request.POST.getlist("cart_id")
+		items = request.POST.getlist("table_id")
 		print(items)
 
 		new_order = Commande(user_id=user)
@@ -171,11 +171,11 @@ def order_view(request):
 		new_order.save()
 
 		for item in items:
-			new_order.cart_id.add(item)
+			new_order.table_id.add(item)
 
 		# set current attribute to False 
-		cart = Cart_List.objects.filter(user_id=request.user)
-		for item in cart:
+		table = Table_List.objects.filter(user_id=request.user)
+		for item in table:
 			item.is_current=False
 			item.save()
 	messages.success(request,"Merci d'avoir fait vos achats chez nous, votre commande a été passée.")
@@ -187,7 +187,7 @@ def removeCommande_view(request,commande_id):
 	item_toremove = Commande.objects.get(pk=commande_id)
 	item_toremove.delete()
 	messages.info(request,"Cette commande a été supprimé .")
-	return HttpResponseRedirect(reverse("cart"))
+	return HttpResponseRedirect(reverse("table"))
 
 @login_required(login_url="/login/")
 def removeReservation_view(request,reservation_id):
@@ -209,10 +209,10 @@ def downloadFacture_view(request,commande_id):
     commandes["Email_du_client"] =request.user.email
     commandes["Numero_de_telephone_du_client"] =request.user.telephone
     commandes["items"] = [] 
-    carts= Cart_List.objects.filter(commande=commande)
-    for cart in carts:
-        c= cart
-        commandes["items"].append({"description": str(cart).split(', - prix: € ')[0], "quantity": 1, "unit_price": int(str(cart).split(', - prix: € ')[-1].split(".")[0])})
+    tables= Table_List.objects.filter(commande=commande)
+    for table in tables:
+        c= table
+        commandes["items"].append({"description": str(table).split(', - prix: € ')[0], "quantity": 1, "unit_price": int(str(table).split(', - prix: € ')[-1].split(".")[0])})
     #Générer une facture
     generate_invoice("media/facture.pdf", commandes)
     print(commandes.items())

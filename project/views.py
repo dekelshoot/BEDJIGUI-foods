@@ -9,7 +9,7 @@ from django.views.generic.edit import UpdateView
 from project.forms import UpdateUser, ReservationForm, LoginForm, RegisterForm,MenuForm
 from django.contrib import messages
 from django.db.models import Sum
-from project.models import User, Reservation,Menu,Commande,Cart_List
+from project.models import User, Reservation,Menu,Commande,Table_List
 
 class Profile(LoginRequiredMixin, UpdateView):
     """
@@ -415,10 +415,10 @@ def view_commande(request):
         - Pour chaque commande dans le curseur:
             - Crée une nouvelle entrée dans le dictionnaire `commandes` avec un identifiant unique (clé).
             - Extrait et stocke des informations pertinentes sur la commande, telles que l'objet `commande` lui-même,
-              la date de création (`created_at`), l'identifiant (`id`), et une liste vide `carts` pour stocker les articles associés.
-            - Récupère les articles du panier (`Cart_List`) associés à la commande courante.
+              la date de création (`created_at`), l'identifiant (`id`), et une liste vide `tables` pour stocker les articles associés.
+            - Récupère les articles du panier (`Table_List`) associés à la commande courante.
             - Calcule le total de la commande en agrégeant le champ `calculated_price` des articles du panier.
-            - Ajoute chaque article du panier au tableau `carts` dans l'entrée de commande correspondante du dictionnaire.
+            - Ajoute chaque article du panier au tableau `tables` dans l'entrée de commande correspondante du dictionnaire.
 
     4. Transmet le dictionnaire `commandes` traité au template `super/view_commande.html` pour le rendu.
     """
@@ -427,13 +427,13 @@ def view_commande(request):
     for commande in Commande.objects.all():
         commandes[i] ={}
         commandes[i]["commande"] =commande
-        commandes[i]["carts"] =[]
+        commandes[i]["tables"] =[]
         commandes[i]["date"] =commande.created_at
         commandes[i]["id"] =commande.id
-        carts= Cart_List.objects.filter(commande=commande)
-        commandes[i]["total"] =carts.aggregate(Sum('calculated_price'))['calculated_price__sum']
-        for cart in carts:
-            commandes[i]["carts"].append(cart)
+        tables= Table_List.objects.filter(commande=commande)
+        commandes[i]["total"] =tables.aggregate(Sum('calculated_price'))['calculated_price__sum']
+        for table in tables:
+            commandes[i]["tables"].append(table)
         i=i+1
         print(commandes.items())
     return render(request,
